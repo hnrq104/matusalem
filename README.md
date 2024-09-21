@@ -48,4 +48,12 @@ Inicialmente, os dados de treinamento (um grande arquivo .txt) não precisam de 
 - https://en.wikipedia.org/wiki/Gated_recurrent_unit
 - https://en.wikipedia.org/wiki/Seq2seq
 - https://en.wikipedia.org/wiki/Attention_(machine_learning)
-Links dos githubs: [eduardomdc](https://github.com/eduardomdc), [ekegg](https://github.com/EkEgg), [hnrq104](https://github.com/hnrq104).
+
+#### Mais links importantes (20/09):
+- https://www.tensorflow.org/text/tutorials/transformer
+- https://www.tensorflow.org/text/tutorials/text_classification_rnn
+- https://www.tensorflow.org/text/tutorials/nmt_with_attention
+- https://keras.io/guides/keras_nlp/getting_started/
+Links dos githubs: 
+
+[eduardomdc](https://github.com/eduardomdc), [ekegg](https://github.com/EkEgg), [hnrq104](https://github.com/hnrq104).
