@@ -4,7 +4,7 @@ Primeira parte: **rnn**.
 - [x] planejamento básico do projeto
 - [x] estudo de RNN'S
 - [x] tutorial de geração de nomes com rnn's
-- [ ] tutorial de classificacao de nomes com rnn's
+- [x] tutorial de classificacao de nomes com rnn's
 - [ ] (opcional) fazer com nn.GRUCell ou nn.RNNCell ou nn.LSTMCell
 - [ ] refazer os dois itens anteriores com o módulo nn.RNN (aceita sequencias)
 - [ ] refazer os anterior com GRU e LSTM
