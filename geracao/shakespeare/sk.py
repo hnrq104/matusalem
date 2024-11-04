@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import numpy as np
-import time
 import random
 import tqdm
 
@@ -12,6 +11,8 @@ with open('shakespeare.txt', 'r') as file:
 # Determine device
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+print(f'Selected device:{device}')
 
 # Create character-to-index and index-to-character mappings
 chars = sorted(set(text))
@@ -70,9 +71,6 @@ def train_model(model, data, epochs=100, seq_length=100, batch_size=64, lr=0.002
 
     batches = list(range(0, len(data) - seq_length, batch_size))
 
-    #timing training
-    start = time.time()
-
     for epoch in range(epochs):
         #maybe later iter randomly!
         if shuffle:
@@ -114,7 +112,8 @@ def train_model(model, data, epochs=100, seq_length=100, batch_size=64, lr=0.002
                 pbar.update(1)
                 pbar.set_postfix(loss=loss.item())
 
-    torch.save(model,f'modelos/sk.pth')
+        if (epoch + 1 % 10) == 0:
+            torch.save(model,f'modelos/sk{epoch}.pth')
 
 def generate_text(model, start_text, length=500, temperature = 1):
     #Not training model, don't need to save backpropagation values
@@ -156,11 +155,11 @@ def generate_text(model, start_text, length=500, temperature = 1):
 
 # Hyperparameters
 hidden_size = 512
-num_layers = 2
-epochs = 30
+num_layers = 3
+epochs = 40
 seq_length = 100
 batch_size = 64
-learning_rate = 0.005
+learning_rate = 0.002
 
 # instantiate the model
 model = ShakespeareRNN(vocab_size, hidden_size, num_layers).to(device)
