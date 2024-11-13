@@ -1,15 +1,25 @@
+import argparse
+parser = argparse.ArgumentParser(
+    prog="matusalem",
+    description="treina uma rnn no arquivo txt",
+)
+
+parser.add_argument('filename',help='path para arquivo de leitura', default='shakespeare.txt')
+parser.add_argument('--save',type=str,help='path para arquivo onde salvar modelo')
+args = parser.parse_args()
+
+# Load text data
+with open(args.filename, 'r') as file:
+    text = file.read()
+
+#imports 
+import tqdm
 import torch
 import torch.nn as nn
 import numpy as np
 import torch.nn.functional
-import tqdm
-
-# Load text data
-with open('shakespeare.txt', 'r') as file:
-    text = file.read()
 
 # Determine device
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 print(f'Selected device:{device}')
@@ -23,9 +33,9 @@ idx2char = {idx: ch for idx, ch in enumerate(chars)}
 text_encoded = np.array([char2idx[ch] for ch in text], dtype=np.int64)
 vocab_size = len(chars)
 
-class ShakespeareRNN(nn.Module):
+class RecurrentNN(nn.Module):
     def __init__(self, vocab_size, hidden_size, num_layers):
-        super(ShakespeareRNN, self).__init__()
+        super(RecurrentNN, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.embedding = nn.Embedding(vocab_size, hidden_size)
@@ -112,8 +122,8 @@ batch_size = 64
 learning_rate = 0.002
 
 # instantiate the model
-model = ShakespeareRNN(vocab_size, hidden_size, num_layers).to(device)
-# model = ShakespeareRNN(vocab_size, hidden_size, num_layers).cuda()
+model = RecurrentNN(vocab_size, hidden_size, num_layers).to(device)
+# model = RecurrentNN(vocab_size, hidden_size, num_layers).cuda()
 
 # Train the model
 train_model(model, 
@@ -124,5 +134,11 @@ train_model(model,
             lr=learning_rate,
             )
 
+# Saving model
+if args.save is not None:
+    print(f'SAVING MODEL ON {args.save}!')
+    torch.save(model,args.save)
+
 # Generate text
+print("GENERATING TEXT MATUSALEM SPEAKS:")
 print(generate_text(model, start_text="BRU",length=2000))
