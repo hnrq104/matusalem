@@ -2,15 +2,23 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{float}
+\usepackage{listings}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{spverbatim}
 \usepackage{hyperref}
 \usepackage{listings}
 
-\title{Text Generation using Recurrent Neural Networks}
-\author{Your Name}
-\date{\today}
+\title{Gerando texto usando Redes Neurais Recorrentes}
+\author{
+    Henrique Cardoso\\
+    \and 
+    Eduardo Monteiro\\
+    \and 
+    Erick Gaiote\\
+    }
+
+\date{}
 
 \begin{document}
 
@@ -52,7 +60,7 @@ A camada totalmente conectada (também chamada de camada linear) recebe como ent
 \subsection{Implementação do Modelo}
 
 A implementação da classe RecurrentNN destaca a arquitetura do modelo. Ela consiste em uma camada de embedding, uma camada recorrente (GRU, neste caso), e uma camada totalmente conectada para a geração de saída. Abaixo está o código em Python que define a classe:
-\begin{verbatim}
+\begin{lstlisting}[language=Python,breaklines]
 import torch
 import torch.nn as nn
 
@@ -77,8 +85,8 @@ class RecurrentNN(nn.Module):
     def init_hidden(self, batch_size):
         h_0 = torch.zeros(self.num_layers, batch_size, self.hidden_size).to(device)
         return h0
-\end{verbatim}
-      
+\end{lstlisting}
+
 \begin{figure}[h!]
    \centering
    \caption{Uma visualização da arquitetura do modelo usando uma camada GRU}
