@@ -1,200 +1,265 @@
-\documentclass[10pt,twocolumn,letterpaper]{article}
-
-\usepackage{statcourse}
-\usepackage{times}
-\usepackage{epsfig}
-\usepackage{graphicx}
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
 \usepackage{amsmath}
+\usepackage{float}
 \usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{spverbatim}
+\usepackage{hyperref}
+\usepackage{listings}
 
-% Include other packages here, before hyperref.
+\title{Text Generation using Recurrent Neural Networks}
+\author{Your Name}
+\date{\today}
 
-% If you comment hyperref and then uncomment it, you should delete
-% egpaper.aux before re-running latex.  (Or just hit 'q' on the first latex
-% run, let it finish, and you should be clear).
-\usepackage[breaklinks=true,bookmarks=false]{hyperref}
-
-
-\statcoursefinalcopy
-
-
-\setcounter{page}{1}
 \begin{document}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DO NOT EDIT ANYTHING ABOVE THIS LINE
-% EXCEPT IF YOU LIKE TO USE ADDITIONAL PACKAGES
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-% O que colocar no relatório:
-% 1. Ideia do projeto
-% 2. alternativas
-% 3. como funciona uma rede neural recorrente
-% 4. diferentes modelos para uma rede neural recorrente (GRU,LSTM)
-% 5. Nossa rede e seu modelo
-% 6. O que é uma "Embedding layer"
-% 6.5 Datasets
-% 7. Nossos resultados, (com diferentes textos e diferentes modelos)
-% 8. (Opcional) O que vem depois - atenção
-% 9. Hardware utilizado
-
-
-%%%%%%%%% TITLE
-\title{Projeto Final -  Introdução a Aprendizado de Máquina ICP-365}
-
-\author{Prof. João Carlos\\
-{\tt\small jpcs@ic.ufrj.br}
-\and
-Eduardo Monteiro\\
-{\tt\small eduardomc@dcc.ufrj.br}
-\and
-Erick Gaiote\\
-{\tt\small erickgs@dcc.ufrj.br}
-\and
-Henrique Cardoso\\
-{\tt\small henriquelc@dcc.ufrj.br}
-}
-
 \maketitle
-%\thispagestyle{empty}
+
+\tableofcontents
+\newpage
+
+\section{Introdução}
+Este relatório detalha a implementação, treinamento e avaliação de um modelo de geração de texto utilizando Redes Neurais Recorrentes (RNNs), com experimentos realizados utilizando camadas clássicas de RNN, GRU (Unidade Recorrente Comportamental) e LSTM (Memória de Longo Prazo). O modelo foi desenvolvido utilizando PyTorch, uma estrutura popular de aprendizado profundo que oferece flexibilidade e facilidade de uso para o design e treinamento de redes neurais. O objetivo inicial do projeto era treinar um modelo especificamente para gerar texto inspirado na Bíblia. No entanto, o escopo foi posteriormente ampliado para incluir outros corpora textuais, demonstrando a flexibilidade e adaptabilidade da arquitetura do modelo para diferentes tipos de dados textuais. O objetivo principal permaneceu ser a geração de texto coerente e contextualmente relevante com base em uma solicitação dada.
+
+\section{Arquitetura do Modelo} O modelo é composto pelos seguintes componentes principais:
+
+\subsection{Camada de Embedding} A camada de embedding mapeia cada caractere no vocabulário para uma representação vetorial densa. Esta camada ajuda o modelo a aprender relações significativas entre os caracteres durante o treinamento. A entrada para a camada de embedding é o índice de um caractere, e a saída é um vetor de tamanho fixo correspondente a esse caractere.
+
+\subsection{Camadas Recorrentes}
+O núcleo do modelo é uma Rede Neural Recorrente (RNN).
+
+Redes Neurais Recorrentes (RNNs) são um tipo de rede neural projetada para processar dados sequenciais, mantendo um estado oculto que evolui ao longo do tempo. No início do processamento de uma sequência, a RNN inicializa um estado oculto, geralmente como um tensor de zeros. À medida que o modelo processa cada elemento na sequência, o estado oculto é atualizado com base tanto na entrada atual quanto no estado oculto anterior. Esse mecanismo recorrente permite que a RNN "lembre" informações de momentos anteriores na sequência, capturando dependências temporais.
+
+As saídas geradas por uma RNN em cada passo de tempo dependem da entrada atual e do contexto acumulado no estado oculto. Por exemplo, em tarefas de geração de texto, o comprimento da sequência determina quanto do contexto de entrada é considerado ao produzir uma saída. Sequências mais longas permitem que o modelo use mais contexto, mas também aumentam a complexidade computacional e o risco de problemas como gradientes que desaparecem, particularmente em arquiteturas RNN mais simples.
+
+A capacidade de reter e processar informações ao longo do tempo dá às RNNs uma vantagem significativa sobre redes neurais feedforward tradicionais. Redes feedforward tratam cada entrada de forma independente, ignorando a natureza sequencial dos dados. Em contraste, as RNNs podem entender e gerar saídas que dependem tanto de elementos imediatos quanto distantes da sequência. Isso as torna especialmente eficazes para tarefas como modelagem de linguagem, onde a relação entre caracteres ou palavras ao longo do tempo é crucial.
+
+No entanto, o comprimento das sequências utilizadas durante o treinamento e a inferência desempenha um papel importante no desempenho das RNNs. Sequências mais curtas podem fazer com que o modelo não capture dependências de longo prazo, enquanto sequências excessivamente longas podem sobrecarregar os recursos computacionais e levar a dificuldades no treinamento. Técnicas como truncamento de sequências, uso de batchs ou o uso de variantes avançadas de RNN, como GRUs ou LSTMs, são frequentemente empregadas para mitigar esses desafios.
+
+Vários tipos de camadas recorrentes foram explorados, incluindo:
+\begin{itemize}
+\item \textbf{RNN:} Uma camada recorrente simples que mantém um estado oculto ao longo dos passos de tempo e o usa como entrada.
+\item \textbf{GRU (Unidade Recorrente Comportamental):} Uma melhoria sobre as RNNs clássicas que utiliza mecanismos de portas para reter ou descartar seletivamente informações, permitindo modelar dependências de longo prazo de forma mais eficaz.
+\item \textbf{LSTM (Memória de Longo Prazo):} Uma camada recorrente mais avançada com portas de esquecimento, entrada e saída, especificamente projetada para abordar as limitações das RNNs clássicas. As LSTMs são excelentes em capturar dependências de longo prazo nas sequências.
+\end{itemize}
 
 
 
-% MAIN ARTICLE GOES BELOW
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Camada Totalmente Conectada - Linear Layer}
+A camada totalmente conectada (também chamada de camada linear) recebe como entrada os resultados das camadas recorrentes — RNN, GRU ou LSTM — e retorna os logits. Esses logits correspondem a cada caractere no vocabulário e são, em seguida, convertidos em probabilidades utilizando a função softmax.
 
+\subsection{Implementação do Modelo}
 
-%%%%%%%%% ABSTRACT
-\begin{abstract}
-   The abstract for your project goes here. The length of the abstract
-   should be between 200-250 words. Tips for writing a good abstract
-   can be found at \url{https://writing.wisc.edu/Handbook/presentations_abstracts.html}.
-\end{abstract}
+A implementação da classe RecurrentNN destaca a arquitetura do modelo. Ela consiste em uma camada de embedding, uma camada recorrente (GRU, neste caso), e uma camada totalmente conectada para a geração de saída. Abaixo está o código em Python que define a classe:
+\begin{verbatim}
+import torch
+import torch.nn as nn
 
-%%%%%%%%% BODY TEXT
-\section{Introduction}
+# Determine device
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-This template is based on the CVPR conference template\footnote{\url{http://statcourse2018.thecvf.com/submission/main_conference/author_guidelines}}.
+class RecurrentNN(nn.Module):
+    def __init__(self, vocab_size, hidden_size, num_layers,dropout=0.5):
+        super(RecurrentNN, self).__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.embedding = nn.Embedding(vocab_size, hidden_size)
+        self.rnn = nn.GRU(hidden_size, hidden_size, num_layers, dropout=dropout, batch_first=True)
+        self.fc = nn.Linear(hidden_size, vocab_size)
 
-The information in this template is very minimal, and this file should serve you as a framework for writing your report. You may prefer to use a more collaboration-friendly tool while drafting the report with your class mates before you prepare the final report for submission. Remember that you should \textbf{submit both the report and code} you used for this project via Canvas. Also, \textbf{only one member per team} needs to submit the project material.
+    def forward(self, x, hidden):
+        x = self.embedding(x)
+        out, hidden = self.rnn(x, hidden)
+        out = self.fc(out)
+        return out, hidden
 
-
-This is an example of a mathematical equation:
-
-$$f(\mathbf{x}; \mathbf{w}) = \sum_{i=1}^{n} w_ix_i.$$
-
-This is a mathematical expression, $h(\mathbf{x}) = \hat{y}$ formatted in text. 
-
-The project report should be 6-8 pages long (not counting references)
-and should contain the sections that are already provided in this paper. Please
-check out the text in these sections for further information.
-
-
-\subsection{Subsection}
-
-You can use paragraphs or subsections to further structure your
-main sections. This is an example of a subsection.
-
-\paragraph{This is a paragraph title.} This is an example of a paragraph.
-
-\section{Related Work}
-
-Related work should be discussed here. This is an example of a citation \cite{mirjalili2018gender}. To format the citations properly, put the
-corresponding references into the bibliography.bib file. You can obtain
-BibTeX-formatted references for the "bib" file from Google Scholar 
-(\url{https://scholar.google.com}), for example, by clicking on the 
-double-quote character under a citation and then selecting \mbox{"BibTeX"} as
-shown in Figure \ref{fig:google-scholar-1col} and 
-Figure \ref{fig:google-scholar-2col}.
-
-\begin{figure}[t]
-\begin{center}
-   \includegraphics[width=20px]{figures/508px-Methuselah_Stained_glass.jpeg}
-\end{center}
-   \caption{Example illustrating how to get BibTeX references from
-   Google Scholar as a 1-column figure.}
-\label{fig:google-scholar-1col}
+    def init_hidden(self, batch_size):
+        h_0 = torch.zeros(self.num_layers, batch_size, self.hidden_size).to(device)
+        return h0
+\end{verbatim}
+      
+\begin{figure}[h!]
+   \centering
+   \caption{Uma visualização da arquitetura do modelo usando uma camada GRU}
+   \includegraphics[width=\textwidth]{figures/text_generation_training.png}
 \end{figure}
 
+\section{Funções e Processo de Treinamento}
 
-\begin{figure*}
-\begin{center}
-   \includegraphics[width=100px]{figures/508px-Methuselah_Stained_glass.jpeg}
-\end{center}
-   \caption{Example illustrating how to get BibTeX references from
-   Google Scholar as a 2-column figure.}
-\label{fig:google-scholar-2col}
-\end{figure*}
+\subsection{Função de Treinamento}
+O processo de treinamento é gerido pela função $\texttt{train\_model}$, que é responsável por otimizar os parâmetros do modelo para gerar texto coerente. Os principais passos neste processo incluem:
 
-Table \ref{tab:some-table} shows an example for formatting a table.
+\begin{enumerate}
+    \item \textbf{Divisão dos dados:} Os dados de texto são divididos em pares de entrada-alvo, onde cada sequência de entrada tem um comprimento fixo, determinado pelo parâmetro $\texttt{seq\_length}$, e o alvo correspondente é a próxima sequência do mesmo comprimento.
+    \item \textbf{Inicialização do modelo:} O estado oculto da RNN é inicializado utilizando a função $\texttt{init\_hidden}$, com um tamanho correspondente ao $\texttt{batch\_size}$ especificado.
+    \item \textbf{Passagem para frente (Forward pass):} Cada lote de sequências de entrada é passado pelo modelo, e as saídas previstas são comparadas com as sequências alvo para calcular a perda usando uma função de perda de entropia cruzada (cross-entropy loss).
+    \item \textbf{Passagem para trás (Backward pass):} Os gradientes são calculados através do backpropagation, e o otimizador Adam atualiza os parâmetros do modelo para minimizar a perda.
+    \item \textbf{Iteração sobre as épocas:} Esse processo é repetido por um número definido de épocas para refinar a capacidade do modelo de prever sequências de texto.
+    \end{enumerate}
+\subsection{Parameters}
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|l|c|}
-\hline
-Method & Accuracy \\
-\hline\hline
-Method 1 & $70 \pm 3$ \% \\
- Method 2 & $76 \pm 3$ \% \\
-\hline
-\end{tabular}
-\end{center}
-\label{tab:some-table}
-\caption{This is an example of a table.}
-\end{table}
+A função $\texttt{train\_model}$ inclui vários parâmetros que são críticos para o processo de treinamento:
 
+\begin{itemize}
+\item $\texttt{epochs}$: Quantas passagens completas sobre o conjunto de dados o modelo fará.
+\item $\texttt{seq\_length=100}$: Cada sequência de entrada consiste em 100 caracteres. Esse comprimento é suficientemente longo para capturar dependências significativas entre os caracteres, enquanto permanece computacionalmente gerenciável.
+\item $\texttt{batch\_size=64}$: O treinamento é realizado em lotes de 64 sequências, o que ajuda a estabilizar o processo de otimização ao calcular a média dos gradientes sobre várias amostras, aproveitando o paralelismo da GPU.
+\item $\texttt{lr=0.002}$: A taxa de aprendizado controla o tamanho das atualizações dos parâmetros durante o treinamento.
+\end{itemize}
 
-\section{Proposed Method}
+\subsection{Geração de Texto}
+A função de geração de texto recebe uma solicitação (prompt) e gera texto amostrando caracteres sequencialmente:
+\begin{enumerate}
+\item O estado oculto (hidden) inicial é definido como zeros.
+\item O prompt é codificado em índices e alimentado no modelo.
+\item A cada passo, os logits de saída são escalados por um parâmetro de temperatura para ajustar a aleatoriedade, e um caractere é amostrado.
+\end{enumerate}
 
-Describe the method(s) you are proposing, developing, or using. I.e., details
-of the algorithms may be included here. 
+\section{Resultados e Discussão}
+\subsection{Exemplos de Texto Gerados}
 
-\section{Experiments}
+Abaixo estão exemplos de textos gerados pela rede neural, todos eles foram feitos com LSTM, pois foi a arquitetura que nos deu melhores resultados. Mas a implementação 
+com uma RNN clássica e uma rede GRU pode ser vista no código.
 
-Describe the experiments you performed. You may want to create separate
-subsections to further structure this section.
+\subsection{Bíblia em inglês}
+Usamos uma versão em inglês da Bíblia, "King James Bible: Pure Cambridge Edition" para treinar uma rede LSTM de 2 camadas, treinamos por somente duas épocas. Com 
+uma RTX 4060 TI, demorou 46 minutos, mas já é possível ver uma estrutura impressionantemente coerente nos resultados. O modelo acerta muito bem a estrutura 
+típica do texto, dividida em versículos, escreve palavras completas (isso é interessante pois ele gera letra por letra) e até consegue criar sentenças que fazem sentido semântico.
 
-\subsection{Dataset}
+Nós particularmente gostamos muito de
+\begin{quote}
+    Revelation 22:5 And from the beast came deep.
+\end{quote}
 
-Briefly describe your dataset in a separate subsection.
+\subsubsection*{\textbf{Texto da Bíblia King James (usado no treinamento):}}
+{
+Genesis 1:1	In the beginning God created the heaven and the earth.
 
+Genesis 1:2	And the earth was without form, and void; and darkness [was] upon the face of the deep. And the Spirit of God moved upon the face of the waters.
 
-\subsection{Software}
+Genesis 1:3	And God said, Let there be light: and there was light.
 
-Briefly list (and cite) software software you used.
-
-\subsection{Hardware}
-
-If relevant, list hardware resources you used.
-
-
-\section{Results and Discussion}
-
-Describe the results you obtained from the experiments and interpret them.
-Optionally, you could split "Results and Discussion" into two separate
-sections.
-
-\section{Conclusions}
-
-Describe your conclusions here. If there are any future directions, you can
-describe them here, or you can create a new section for future directions.
-
-\section{Acknowledgements}
-
-List acknowledgements if any. For example, if someone provided you a dataset, or
-you used someone else's resources, this is a good place to acknowledge
-the help or support you received.
-
-\section{Contributions}
-
-Describe the contributions of each team member who worked on this project.
-
-
-{\small
-\bibliographystyle{ieee}
-\bibliography{bibliography.bib}
+Genesis 1:4	And God saw the light, that [it was] good: and God divided the light from the darkness.
 }
 
+
+\subsubsection*{\textbf{Texto Gerado pela Rede Neural}: (sequência inicial "Henrique says")}
+      Henrique says upon them, and the earth shall be fallen: and I heard at heaven from the bodies together in the winepress and swelling fell of the meders of Offer a sea.
+      
+      Revelation 21:15        And he like a first pray peared in purple: which is fled together upon the number death, said [shall received] the morning of God.
+      
+      Revelation 19:9 And I saw her angel better.
+      
+      Revelation 21:1do.
+      
+      Revelation 19:7 And the mouth come up with seat, and the fruits which shall rescret him deed the little of the seven great death.
+      
+      Revelation 21:12        And Oful were no more precious book.
+      
+      Revelation 22:5 And from the beast came deep.
+      
+      Revelation 24:7 But clothed him the testimony of his hread: for the image behold them with earth, [by nations: it] he said unto them, Where were treadined by the earth in men before them and her head for the heaven, and an head two heaven, [but] shall be child God: for thou gavest tribualling a woman, and four righteous works, and over all thunders called ever the throne, and [is] glory:
+      
+      Revelation, Their are shall swoon for a vail, and he sealed the beast were apostles.
+      
+      Revelation 21:17        And he said unto my earth. These things the forlsh and smoke as for them, and the fowls of great, [and] in his wrath.
+
+\subsection{Bíblia em Português}
+    Para um segundo exemplo, usaremos uma LSTM novamente, mas para fins demonstrativos treinaremos um modelo com 3 camadas recorrentes com só os primeiros
+    100000 caracteres da bíblia em Português. Por se tratar de tão pouco texto, o treinamento durou 1 minuto e 40 segundos. Dá para perceber novamente que o Modelo está 
+    começando a aprender as palavras, já aprendeu como separa-las em espaços e sabe que alguns periodos terminam com ';'.
+
+
+\subsubsection*{\textbf{Texto da Bíblia em Português (usado no treinamento):}}
+{
+    GÊNESIS 1\\1 No princípio criou Deus os céus e a terra.\\
+    2 A terra era sem forma e vazia; e havia trevas sobre a face do abismo, mas o Espírito de Deus pairava sobre a face das águas.\\
+    3 Disse Deus: haja luz. E houve luz.\\
+    4 Viu Deus que a luz era boa; e fez separação entre a luz e as trevas.\\
+    5 E Deus chamou à luz dia, e às trevas noite. E foi a tarde e a manhã, o dia primeiro.\\ 
+    6 E disse Deus: haja um firmamento no meio das águas, e haja separação entre águas e águas.
+}
+
+\subsubsection*{\textbf{Texto Gerado pela Rede Neural}:}
+E o professor João Carlos, rei vitorioso das máquinas, derrotou o Diabodo;\\
+11 chegou as és filhas da ti! Aonte, pois o cormaram e o meu, e irmãe de Abraão, comer:\\
+14, pois, foi a multiploido, tomeu, para Por para , podo o clegou Abraão que a teu irmã do serão tomou a terra, e será estava a Zarã o bendito, e o teriam Esaú a Haarã.
+4 Vês vosso Isaque o que disse para Jacó, e semento farei.\\
+Ê Ora; Jeqia a Isaque, as naores-lha de Abraão tomou a tudo a mulher fora morte a Jacó de Por teu benditar do Senhor a suete de foi de sua mãe, pelo despo a Canaã e a terra;\\
+28 endão a Ismael de Abraão será  e deu sobre dia que o céu, pois, vinha da suas filhas dos palabequelas de Jacó poite em vieram os descendência descendência de terra;\\
+12 e te hei daquele her e à nibdarei a Mobo.
+
+\subsection{\textbf{A República - Platão (inglês):}}
+O próximo exemplo usou 3 camadas e treinou durante 10 épocas, o treinamento durou 1 hora e 40 minutos para ser finalizada. E interessantemente,
+o resultado não parece muito melhor que os outros.
+
+\subsubsection*{\textbf{Texto de A República - Platão (inglês):}}
+
+{
+    \begin{verbatim}
+        No, I would rather say sublime simplicity.
+        
+        Then would you call injustice malignity?
+        
+        No; I would rather say discretion.
+        
+        And do the unjust appear to you to be wise and good?
+        
+        Yes, he said; at any rate those of them who are able 
+        to be perfectly unjust, and who have the power of 
+        subduing states and nations; but perhaps you imagine me to be 
+        talking of cutpurses. Even this profession if undetected 
+        has advantages, though they are not to be compared with
+        those of which I was just now speaking.
+    \end{verbatim}
+}
+
+\subsubsection*{\textbf{Texto Gerado pela Rede Neural}: prompt inicial: "Eduardo the great philo"}
+\begin{verbatim}
+    Eduardo, the great philosopher, as
+    free format used by the State after death, not to
+    lorm and in all, about your experience; smort define events are worth
+    remove or intelligence in Homer, a trademark/providing the sake of
+    copies or habit or a peivable spirit and courts
+    and protections of this to dwelt access into transcript forth
+    rital painting, without wealth or ears permit in covetous body:
+    allor, Taught knowledge which you outing proach its perform
+    with a copy, or trained taxes, although may ill
+\end{verbatim}
+
+Ainda é dificil fazer sentido das palavras, a rede não foi capaz de aprender semântica, e esquisitamente ela 
+deu muito peso para a parte inicial do texto - onde estão escritas especificações sobre o projeto Guthenberg.
+Um pouco a frente na geração é possível ler essa esquisitisse:
+
+\begin{verbatim}
+Project Gutenberg processes of men passes for each one at wife. 
+You must run away, he could expend them cutting and birth and 
+make space to the previous and in the fee and Atropos with this work. 
+And unjust lecking ridiculous astronomy, or sacred honoured from payment
+for this work or destroy all the loves of a 
+Project Gutenberg™ electronic works lotical lights and you 
+arranged.), compound some forms.
+         • You provide forth with the crew, and avertepic length, all
+electronic works, processes of end, upon a creating uses
+\end{verbatim}
+
+Isso provavelmente indica uma estranha espécie de overfitting para certas partes do texto.
+
+
+
+\section{References}
+\begin{itemize}
+   \item \url{https://karpathy.github.io/2015/05/21/rnn-effectiveness/}
+   \item \url{https://colah.github.io/posts/2015-08-Understanding-LSTMs/}
+   \item \url{https://www.tensorflow.org/text/tutorials/text_generation}
+   \item \url{https://pytorch.org/tutorials/intermediate/char_rnn_generation_tutorial.html}
+   \item \url{https://pytorch.org/tutorials/intermediate/char_rnn_classification_tutorial.html}
+   \item \url{https://en.wikipedia.org/wiki/Recurrent_neural_network}
+   \item \url{https://en.wikipedia.org/wiki/Gated_recurrent_unit}
+   \item \url{https://www.tensorflow.org/text/tutorials/transformer}
+   \item \url{https://www.tensorflow.org/text/tutorials/text_classification_rnn}
+   \item \url{https://www.tensorflow.org/text/tutorials/nmt_with_attention}
+\end{itemize}
+   
 \end{document}
